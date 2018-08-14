@@ -1,0 +1,36 @@
+#!/bin/csh
+#
+#  purge -  delete (softly) editor backup files (ending with ~) 
+#
+#  This shell script moves all *~ and .*~ files to ~/.garbage.bin
+#  If ~/.garbage.bin does not exist then it is created.
+#  If ~/.wastebasket already exists (OpenWindows!) then a link is created
+# 
+#  Eric Myers, Department of Physics and Astronomy, Vassar College 
+#  @(#) $Revision: 1.3 $    		$Date: 1998/05/23 17:17:33 $ 
+######################################################################
+
+####################
+## If the ~/.garbage.bin does not exist then create it
+
+if ( ! -d ~/.garbage.bin ) then
+  echo "Creating ~/.garbage.bin ..."
+
+# if ~/.wastebasket exists (OpenWindows) then create a link to it,
+# otherwise create it as a link, for the future
+
+  if ( -d ~/.wastebasket ) then
+    ln -s ~/.wastebasket ~/.garbage.bin
+  else
+    /bin/mkdir ~/.garbage.bin		
+    ln -s ~/.garbage.bin ~/.wastebasket 
+  endif
+endif
+
+####################
+# Now move all files ending in ~ to the ~/.garbage.bin
+
+/bin/mv -f *~ .*~  ~/.garbage.bin 
+
+exit 
+

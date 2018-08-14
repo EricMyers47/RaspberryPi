@@ -1,0 +1,44 @@
+# @(#) .tcshrc for myers@umich.edu  -EAM 05Oct2000
+# $Id: .tcshrc,v 1.4 2000/10/05 22:43:04 myers Exp myers $
+######################################################################
+
+source $HOME/.cshrc		# first get all my usual .cshrc things
+#				# then tcsh stuff:
+set history=100
+set savehist=(100 merge)
+alias h history 20
+
+if ( $?EMACS ) exit             # no fancy stuff in an emacs subshell
+
+# -- command correction:
+
+set correct=cmd
+set rmstar
+
+# regular commands to check things
+
+set tperiod=5
+# alias periodic "ckcrond; ckcondor"
+alias periodic "ckcrond"
+
+#
+
+set watch=( root any any console )
+
+#-- don't time out, unless I'm root
+
+unset autologout
+if ( `whoami` == "root") set autologout=60
+
+#-- prompt with cwd in it.  Undo what .cshrc did to cd, pd, pop
+
+set promptchars=">#"
+set prompt="%m:%C%# " 
+unalias setprompt
+unalias cd; unalias pd; unalias pop; alias pd pushd; alias pop popd
+
+# This will put user@host in the xterm title bar:
+#alias precmd 'echo -n "]1;${USER}@${HOST} ]2;${HOST} $cwd " '
+unalias precmd 
+
+##

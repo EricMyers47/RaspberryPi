@@ -1,0 +1,48 @@
+#!/bin/sh
+#
+#  dcopy- Syncronize directories using rsync (one way only)
+#
+#  This script syncronizes the current directory from a corresponding
+#  directory  on the host $DSYNCHOST.  The directories must have the same
+#  relative position under the $HOME directory on the two machines (or
+#  they must both not be under $HOME, and absolute pathnames must be used).
+#
+#  Files listed in .dsync.exclude in the current directory are
+#  excluded, if that file exists in the current directory or else in
+#  the home directory.
+#
+#  In contrast to dsync, this is only a one-way transfer from the
+#  server ($DSYNCHOST) to the client.   Files that exist on the
+#  client but not on the server are not deleted (at present).
+#
+#  This is just a simple application of the rsync command.  See rsync(1)
+#  for further details.
+#
+#  Eric Myers <myers@vassar.edu>  -  16 March 2004
+#  @(#) $Id: dcopy,v 1.2 2004/03/16 23:08:13 myers Exp myers $
+########################################################################
+# Remote host to sync with:
+
+DSYNCHOST=${DSYNCHOST-"www.spy-hill.net"}
+
+# Get the current path (with leading $HOME removed if possible)
+
+CWD=`pwd | sed -e s,^$HOME/,,`
+
+## Check for list of files to exclude
+
+if [ -f ./.dsync.exclude ]; then
+  EXCLUDE="--exclude-from=./.dsync.exclude"
+else
+  if [ -f $HOME/.dsync.exclude ]; then
+    EXCLUDE="--exclude-from=$HOME/.dsync.exclude"
+  fi
+fi
+
+
+## Syncronize local directory from remote host (only)
+
+rsync -e ssh -rlptgbvuz  $EXCLUDE ${DSYNCHOST}:${CWD}/  .
+
+exit 0
+

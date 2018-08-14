@@ -1,0 +1,44 @@
+#!/bin/csh
+#  
+#   del - delete files softly
+#
+#   The files named on the command line are copied to the ~/.garbage.bin 
+#   directory.  If that directory doesn't exist, it is created.
+#
+#   Dont' forget to take.out.garbage!
+#  
+#   Eric Myers, Boston University, 11 August, 1988
+#   Revised by Eric Myers <myers@noether.vassar.edu> on 16 October 1993
+#   @(#) $Revision: 1.4 $		$Date: 1998/05/23 16:58:40 $
+#######################################################################
+
+if ($#argv < 1) then
+  echo "usage:  del file-names"
+  exit 1
+endif
+
+####################
+## If the ~/.garbage.bin does not exist then create it
+
+if ( ! -d ~/.garbage.bin ) then
+  echo "Creating ~/.garbage.bin ..."
+
+# if ~/.wastebasket exists (OpenWindows) then create a link to it,
+# otherwise create it as a link, for the future
+
+  if ( -d ~/.wastebasket ) then
+    ln -s ~/.wastebasket ~/.garbage.bin
+  else
+    /bin/mkdir ~/.garbage.bin		
+    ln -s ~/.garbage.bin ~/.wastebasket 
+  endif
+endif
+
+####################
+## Now that ~/.garbage.bin exits, copy the files to it
+
+foreach FILE ( $* ) 
+   mv -f "$FILE"  ~/.garbage.bin 	
+end
+
+exit 0

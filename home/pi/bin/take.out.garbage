@@ -1,0 +1,29 @@
+#! /bin/csh
+#  Takes out the garbage (removes files from ~/.garbage.bin)
+#  and then schedules the next cleaning
+#
+#  Eric Myers <myers@buphy.bu.edu>, Boston University, 11 August, 1988
+#  Modified Scott Hannahs 25 Nov 1988
+#  Modified again by Eric Myers, 30 January, 1989 and 27 Feb. 1989
+#  Modified for Sun OS 4.1.1 by Eric Myers, 27 January 1991
+#  Revised again by Eric Myers <myers@noether.vassar.edu> on 16 October 1993
+#  @(#)  $Revision: 1.1 $   		$Date: 1996/08/26 14:54:29 $
+#======================================================================*
+set ME=`which take.out.garbage`
+
+set TTY=`tty`
+if ( $status == "1" ) set TTY=/dev/null
+
+# ---------- first take out the garbage...
+
+set X=`/bin/ls -A1  ~/.garbage.bin `
+if ( ${#X} > 0  ) then
+  ( cd ~/.garbage.bin ; /bin/rm -rf $X )
+endif
+
+# ---------- next schedule further weekly cleanings...
+
+echo -n "Scheduling next cleaning: " >& $TTY
+at 0415 sunday + 1 day  $ME          >& $TTY
+if ( -e ~/.activity && -w ~/.activity ) \
+   echo `/usr/bin/date "+%a %h %d %T"` : take.out.garbage >> ~/.activity

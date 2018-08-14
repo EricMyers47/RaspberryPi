@@ -1,0 +1,77 @@
+#! /bin/sh
+# 
+#  clean - discarding files that YOU don't want
+#
+#  This script "deletes" selected files by moving them to
+#  $HOME/.garbage.bin (so they can actually be recoverd, if needed).
+#
+#  Most of the files it deletes are things that most people don't care
+#  to keep around - core files and old version files from editors.
+#  You can easily modify the list of files by adding or removing the
+#  appropriate lines clean_up lines.  
+#
+#  You can also store patterns naming particular files you want
+#  deleted in a file called .cleanrc.  When clean is run from a
+#  particular directory the .cleanrc in THAT directory is used (if it
+#  exists). 
+#
+#  This script requires a Bourne shell (/bin/sh) which knows function
+#  defintions.  Most do, but some old ones don't.  Try bash instead.
+#
+#  Eric Myers, Boston University, 11 August, 1988
+#  @(#) $Revision: 1.5 $		$Date: 1998/05/23 16:46:25 $
+#======================================================================*
+# Function to do the work:  (This may not work on older versions of sh)
+
+clean_up () {
+   if [ $# -gt 0 ]; then
+     for FILE in $* 
+      do
+        if [ -r "$FILE" ]; then
+          mv $FILE ${HOME}/.garbage.bin
+        fi
+     done
+    fi;}
+
+
+####################
+##  If the ~/.garbage.bin does not exist then create it
+
+if [ ! -d $HOME/.garbage.bin ]; then
+  echo "Creating ~/.garbage.bin ..."
+
+##  if ~/.wastebasket exists (OpenWindows) then create a link to it,
+##  otherwise create it as a link, for the future.
+
+  if [ -d $HOME/wastebasket ]; then
+    ln -s $HOME/.wastebasket ${HOME}/.garbage.bin
+  else
+    /bin/mkdir ${HOME}/.garbage.bin		
+    ln -s ${HOME}/.garbage.bin ${HOME}/.wastebasket 
+  fi
+fi
+
+
+####################
+##  Now throw all these files away:
+
+clean_up  *~ .*~ 	# emacs version files
+clean_up  \#*\#		# emacs autosave files
+clean_up  core		# core dumps
+clean_up  *.lis		# listing files from compiler
+# clean_up  *.map		#  map files from compiler
+clean_up  *.trace	# traceback listings
+clean_up  TeXbuffer.*	# emacs TeXbuffer
+clean_up  dead.*	# dead.letter and dead.article
+clean_up  \#groff-buffer*   # emacs groff-buffers
+
+
+####################
+## Also files listed in ./.cleanrc
+
+if [ -r ./.cleanrc ]; then
+  read CLEANPAT < ./.cleanrc
+  clean_up $CLEANPAT
+fi
+
+exit

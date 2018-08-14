@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+#  dsync - Syncronize directories using rsync
+#
+#  This script syncronizes the current directory with a corresponding
+#  directory  on the host $DSYNCHOST.  The directories must have the same
+#  relative position under the $HOME directory on the two machines (or
+#  they must both not be under $HOME, and absolute pathnames must be used).
+#
+#  Files listed in .dsync.exclude in the current directory are
+#  excluded, if that file exists in the current directory or else in
+#  the home directory.
+#
+#  This is just a simple application of the rsync command.  See rsync(1)
+#  for further details.
+#
+#  Eric Myers <myers@umich.edu> - 28 November 1999
+#  @(#) $Id: dsync,v 2.1 1999/12/28 17:39:27 myers Exp myers $
+########################################################################
+# Remote host to rsync to:
+
+DSYNCHOST=${DSYNCHOST-"www.spy-hill.net"}
+
+# Get the current path (with leading $HOME removed if possible)
+
+CWD=`pwd | sed -e s,^$HOME/,,`
+
+# Check for list of files to exclude
+
+if [ -f ./.dsync.exclude ]; then
+  EXCLUDE="--exclude-from=./.dsync.exclude"
+else
+  if [ -f $HOME/.dsync.exclude ]; then
+    EXCLUDE="--exclude-from=$HOME/.dsync.exclude"
+  fi
+fi
+
+# Syncronize local and remote directories:
+
+rsync -rlptgbvuz -e ssh $EXCLUDE ${DSYNCHOST}:${CWD}/  .
+rsync -rlptgbvuz -e ssh $EXCLUDE  .  ${DSYNCHOST}:${CWD}/
+
+exit 0
+
