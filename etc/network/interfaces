@@ -1,0 +1,45 @@
+# interfaces(5) file used by ifup(8) and ifdown(8)
+
+# Please note that this file is written to be used with dhcpcd
+# For static IP, consult /etc/dhcpcd.conf and 'man dhcpcd.conf'
+
+# This would Include files from /etc/network/interfaces.d:
+### source-directory /etc/network/interfaces.d
+
+# Wired network, if we use it, is an "upstream" connection via DHCP
+
+auto eth0
+allow-hotplug eth0
+iface eth0 inet dhcp
+
+## First wifi, wlan0, is an upstream connection, via DHCP
+
+auto wlan0
+allow-hotplug wlan0
+iface wlan0 inet static
+  address 192.168.1.99
+  network 192.168.1.0
+  netmask 255.255.255.0
+  broadcast 192.168.1.255
+  gateway 192.168.1.1
+  wpa-ssid "Myers"
+  wpa-psk "Uncle Elephant"
+  wpa-group TKIP CCMP
+  wpa-key-mgmt WPA-PSK
+
+
+# Second wifi, wlan1, is the local network to be relayed.
+# See /etc/dhcpcd.conf to disable wpa_supplicant for wlan1
+
+auto wlan1
+allow-hotplug wlan1
+iface wlan1 inet static
+  address 192.168.47.1
+  network 192.168.47.0
+  netmask 255.255.255.0
+  broadcast 192.168.47.255
+  gateway 192.168.47.1
+
+  pre-up iptables-restore < /etc/network/iptables
+  
+##
