@@ -1,0 +1,25 @@
+# Set/save system clock to/from hardware clock
+# @(#) Last changed: -EAM 02Oct2018
+######################################################################
+
+[Unit]
+Description=Set/save the system clock from a hardware clock
+Documentation=man:hwclock(8)
+DefaultDependencies=no
+Before=sysinit.target,systemd-timesyncd
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/default/hwclock
+ExecStart=/sbin/hwclock --utc --hctosys 
+RemainAfterExit=true
+TimeoutSec=60
+
+##NO: only change the HW clock manually
+##ExecStop=/sbin/hwclock  --utc --systohc
+
+
+[Install]
+WantedBy=sysinit.target
+##

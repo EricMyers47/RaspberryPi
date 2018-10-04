@@ -1,0 +1,19 @@
+# systemd service to start a time-lapse camera at boot
+# @(#) Last changed: -EAM 02Oct2018
+######################################################################
+
+[Unit]
+Description=Time-lapse camera
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/www/images
+ExecStart=/etc/init.d/AutoCamera start
+StandardOutput=inherit
+StandardError=inherit
+RestartPreventExitStatus=111
+
+[Install]
+WantedBy=multi-user.target
+
+##
